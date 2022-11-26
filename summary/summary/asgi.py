@@ -1,5 +1,5 @@
 """
-ASGI config for summary_service project.
+ASGI config for summary project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'summary_service.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'summary.settings')
 
 application = get_asgi_application()

@@ -85,6 +85,6 @@ def consume_file(request):
         summaryText.close()
 
         
-        return HttpResponse(request.FILES['file'].name)
+       
 
     #return render(request, 'summary_app/index.html')

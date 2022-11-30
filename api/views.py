@@ -8,20 +8,27 @@ import pytesseract
 import re
 import slate3k as slate
 import pdf2image
+import PyPDF2
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem.snowball import SnowballStemmer
 from PIL import Image
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
+
+
 def consume_file(request):
     if request.method == 'POST':
         print(request.FILES['file'])
-        return HttpResponse(request.FILES['file'].name)
+        
+    
+        
+        doc = PyPDF2.PdfFileReader(file)
+        pages = doc.getNumPages()
 
         # Extract text from PDF file
         text = ""
-        for page in pdfPages:
+        for page in pages:
             text += page
         
             
@@ -84,7 +91,7 @@ def consume_file(request):
         summaryText.write(summary)
         summaryText.close()
 
-        
+        return HttpResponse(request.FILES['file'].name)
        
 
     #return render(request, 'summary_app/index.html')

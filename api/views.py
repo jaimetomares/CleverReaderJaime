@@ -22,7 +22,7 @@ def consume_file(request):
         print(request.FILES['file'])
         
     
-        
+        file = request.FILES['file']
         doc = PyPDF2.PdfFileReader(file)
         pages = doc.getNumPages()
 

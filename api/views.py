@@ -17,7 +17,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 def consume_file(request):
     if request.method == 'POST':
         print(request.FILES['file'])
-        return HttpResponse(request.FILES['file'].name)
+        
     
         extension = request.FILES['file'].name.split(".")
         extension[1] != "pdf"
@@ -91,6 +91,6 @@ def consume_file(request):
         summaryText.close()
 
         
-       
+        return HttpResponse(request.FILES['file'].name)
 
     #return render(request, 'summary_app/index.html')

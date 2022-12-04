@@ -88,7 +88,13 @@ def consume_file(request):
         #summaryText.write(summary)
         #summaryText.close()
 
+        
         return HttpResponse(summary)
+    extension = request.FILES['file'].name.split(".")
+    extension[1] != "pdf"
+    extension = ["sample", "pdf"]
+    if(extension[1] != "pdf"):
+        return HttpResponse.status_code == 400
        
 
     #return render(request, 'summary_app/index.html')

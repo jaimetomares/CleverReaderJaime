@@ -21,19 +21,21 @@ def consume_file(request):
     if request.method == 'POST':
         print(request.FILES['file'])
         
-    
+        
         file = request.FILES['file']
         doc = PyPDF2.PdfFileReader(file)
         pages = doc.getNumPages()
-
+        extracted_text = ""
         # Extract text from PDF file
-        text = ""
-        for page in pages:
-            text += page
+        # Get each page and extract text
+        for i in range(pages):
+            curr_page = doc.getPage(i)
+            curr_text = curr_page.extractText()
+            extracted_text += curr_text
         
             
 
-        processedText = re.sub("’", "'", text)
+        processedText = re.sub("’", "'", extracted_text)
         processedText = re.sub("[^a-zA-Z' ]+", " ", processedText)
         stopWords = set(stopwords.words("english"))
         words = word_tokenize(processedText)
@@ -51,7 +53,7 @@ def consume_file(request):
                 freqTable[stemmer.stem(word)] = 1
 
         # Normalize every sentence in the text
-        sentences = sent_tokenize(text)
+        sentences = sent_tokenize(extracted_text)
         stemmedSentences = []
         sentenceValue = dict()
         for sentence in sentences:
@@ -87,11 +89,11 @@ def consume_file(request):
         # Process the text in summary and write it to a new file
         summary = re.sub("’", "'", summary)
         summary = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", summary)
-        summaryText = open(uploaded_file.name + "Summary.txt", "w")
-        summaryText.write(summary)
-        summaryText.close()
+        #summaryText = open(uploaded_file.name + "Summary.txt", "w")
+        #summaryText.write(summary)
+        #summaryText.close()
 
-        return HttpResponse(request.FILES['file'].name)
+        return HttpResponse(summary)
        
 
     #return render(request, 'summary_app/index.html')

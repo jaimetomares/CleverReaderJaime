@@ -1,22 +1,26 @@
 from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
 from django.conf import settings
 import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
 import re
 import PyPDF2
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem.snowball import SnowballStemmer
 
-
-
-
-
 def consume_file(request):
     if request.method == 'POST':
-        print(request.FILES['file'])
-         
-        
+
         file = request.FILES['file']
+
+        extension = file.name.split(".")
+        extension[1] != "pdf"
+        extension = ["sample", "pdf"]
+        if(extension[1] != "pdf"):
+            return HttpResponseBadRequest
+
         doc = PyPDF2.PdfFileReader(file)
         pages = doc.getNumPages()
         extracted_text = ""
@@ -27,8 +31,6 @@ def consume_file(request):
             curr_page = doc.getPage(i)
             curr_text = curr_page.extractText()
             extracted_text += curr_text
-        
-            
 
         processedText = re.sub("’", "'", extracted_text)
         processedText = re.sub("[^a-zA-Z' ]+", " ", processedText)
@@ -81,20 +83,10 @@ def consume_file(request):
                 if sentence[:12] in sentenceValue and sentenceValue[sentence[:12]] > (3.0 * average):
                     summary += " " + " ".join(sentence.split())
 
+        
         # Process the text in summary and write it to a new file
         summary = re.sub("’", "'", summary)
         summary = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", summary)
-        #summaryText = open(uploaded_file.name + "Summary.txt", "w")
-        #summaryText.write(summary)
-        #summaryText.close()
 
         
         return HttpResponse(summary)
-    extension = request.FILES['file'].name.split(".")
-    extension[1] != "pdf"
-    extension = ["sample", "pdf"]
-    if(extension[1] != "pdf"):
-        return HttpResponse.status_code == 400
-       
-
-    #return render(request, 'summary_app/index.html')

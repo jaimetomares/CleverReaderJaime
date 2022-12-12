@@ -37,6 +37,7 @@ def consume_file(request):
         extracted_text = re.sub(r'\s+', ' ', extracted_text)  
 
 
+
         processedText = re.sub("’", "'", extracted_text)
         processedText = re.sub("[^a-zA-Z' ]+", " ", processedText)
         stopWords = set(stopwords.words("english"))
@@ -117,6 +118,7 @@ def consume_file(request):
         summary = re.sub('7', '', summary)
         summary = re.sub('8', '', summary)
         summary = re.sub('9', '', summary)
+
 
 
 

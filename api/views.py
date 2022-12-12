@@ -32,6 +32,12 @@ def consume_file(request):
             curr_text = curr_page.extractText()
             extracted_text += curr_text
 
+
+        extracted_text = re.sub(r'\[[0-9]*\]', ' ', extracted_text)  
+        extracted_text = re.sub(r'\s+', ' ', extracted_text)  
+
+
+
         processedText = re.sub("’", "'", extracted_text)
         processedText = re.sub("[^a-zA-Z' ]+", " ", processedText)
         stopWords = set(stopwords.words("english"))
@@ -87,6 +93,36 @@ def consume_file(request):
         # Process the text in summary and write it to a new file
         summary = re.sub("’", "'", summary)
         summary = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", summary)
+
+        summary = re.sub('(https:? )', '', summary)
+        summary = re.sub('Fig', '', summary)
+        summary = re.sub('Figure', '', summary)
+        summary = re.sub('page', '', summary)
+        summary = re.sub('Page', '', summary)
+        summary = re.sub('doi.org', '', summary)
+        summary = re.sub('doi.', '', summary)
+        summary = re.sub('org', '', summary)
+        summary = re.sub('.com', '', summary)
+
+
+        summary = re.sub('()', '', summary)
+        summary = re.sub(':', '', summary)
+
+        summary = re.sub('0', '', summary)
+        summary = re.sub('1', '', summary)
+        summary = re.sub('2', '', summary)
+        summary = re.sub('3', '', summary)
+        summary = re.sub('4', '', summary)        
+        summary = re.sub('5', '', summary)
+        summary = re.sub('6', '', summary)
+        summary = re.sub('7', '', summary)
+        summary = re.sub('8', '', summary)
+        summary = re.sub('9', '', summary)
+
+
+
+
+
 
         
         return HttpResponse(summary)

@@ -72,7 +72,6 @@ def consume_file(request):
                 
 #print(word_frequencies)
 
-
         max_frequency = max(word_frequencies.values())
 #print(max_frequency)
 

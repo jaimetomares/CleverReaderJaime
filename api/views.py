@@ -50,7 +50,12 @@ def consume_file(request):
             text = text.replace(title, '')
 
 
+        # Detect PDF text language
+        language = detect(text)
         
+        # Load the appropriate language model based on the detected language
+        nlp = spacy.load(f'{language}_core_web_sm')
+        #This will return a language object nlp containing all components and data needed to process text.
 
         text = re.sub(r'\[[0-9]*\]', ' ', text)  
         text = re.sub(r'\s+', ' ', text)  

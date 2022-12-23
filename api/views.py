@@ -4,6 +4,8 @@ from django.conf import settings
 import PyPDF2
 import re
 
+from langdetect import detect
+
 import spacy
 from spacy.lang.en.stop_words import STOP_WORDS
 from string import punctuation
@@ -34,6 +36,22 @@ def consume_file(request):
 
 
 
+        # Delete reference sections
+        text = re.sub(r'References.*', '', text, flags=re.DOTALL)
+ 
+            # Delete tables
+        text = re.sub(r'\n\s*\n\s*\|.*\|\s*\n', '\n', text, flags=re.DOTALL)
+ 
+            # Detect titles títulos
+        titles = re.findall(r'^\s*#+ .*$', text, flags=re.MULTILINE)
+ 
+            # Delete titles of the text
+        for title in titles:
+            text = text.replace(title, '')
+
+
+        
+
         text = re.sub(r'\[[0-9]*\]', ' ', text)  
         text = re.sub(r'\s+', ' ', text)  
 
@@ -43,8 +61,7 @@ def consume_file(request):
         #Here we will create a list of stopwords.
         stopwords = list(STOP_WORDS)
 
-        #This will return a language object nlp containing all components and data needed to process text.
-        nlp = spacy.load('en_core_web_sm')
+        
 
         #Calling the nlp object on a string of text will return a processed Doc. During processing, spaCy first tokenizes the text, i.e. segments it into words, punctuation and so on.
         doc = nlp(text)

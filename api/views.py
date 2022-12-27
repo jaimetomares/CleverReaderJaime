@@ -4,8 +4,6 @@ from django.conf import settings
 import PyPDF2
 import re
 
-import uuid
-
 from langdetect import detect
 
 import spacy
@@ -20,11 +18,12 @@ def consume_file(request):
         file = request.FILES['file']
 
         extension = file.name.split(".")
+        extension[1] != "pdf"
+        extension = ["sample", "pdf"]
         if(extension[1] != "pdf"):
             return HttpResponse("El archivo debe ser un PDF.")
 
         doc = PyPDF2.PdfFileReader(file)
-        keywords = []
 
         nlp = spacy.load('en_core_web_sm')
 
@@ -35,6 +34,11 @@ def consume_file(request):
             curr_text = curr_page.extractText()
             text += curr_text.strip()
 
+
+        pattern = r'(http|https).+?(?=\s|$)'
+        # Utiliza re.sub() para buscar el patrón y reemplazarlo con una cadena vacía
+        text = re.sub(pattern, '', text)
+        
         # Delete reference sections
         text = re.sub(r'References.*', '', text, flags=re.DOTALL)
  
@@ -57,9 +61,7 @@ def consume_file(request):
 
 
 
-        pattern = r'(http|https).+?(?=\s|$)'
-        # Utiliza re.sub() para buscar el patrón y reemplazarlo con una cadena vacía
-        text = re.sub(pattern, '', text)
+        
 
 
         text = re.sub(r'\[[0-9]*\]', ' ', text)  

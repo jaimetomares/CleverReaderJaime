@@ -4,6 +4,8 @@ from django.conf import settings
 import PyPDF2
 import re
 
+import uuid
+
 from langdetect import detect
 
 import spacy
@@ -12,29 +14,26 @@ from string import punctuation
 
 from heapq import nlargest
 
-def consume_file(request):
-    if request.method == 'POST': 
 
+def consume_file(request):
+    if request.method == 'POST':
         file = request.FILES['file']
 
         extension = file.name.split(".")
-        extension[1] != "pdf"
-        extension = ["sample", "pdf"]
         if(extension[1] != "pdf"):
-            return HttpResponseBadRequest
+            return HttpResponse("El archivo debe ser un PDF.")
 
         doc = PyPDF2.PdfFileReader(file)
+        keywords = []
+
+        nlp = spacy.load('en_core_web_sm')
+
         pages = doc.getNumPages()
         text = ""
-        
-        # Extract text from PDF file
-        # Get each page and extract text
         for i in range(pages):
             curr_page = doc.getPage(i)
             curr_text = curr_page.extractText()
             text += curr_text.strip()
-
-
 
         # Delete reference sections
         text = re.sub(r'References.*', '', text, flags=re.DOTALL)
@@ -52,10 +51,16 @@ def consume_file(request):
 
         # Detect PDF text language
         language = detect(text)
-        
         # Load the appropriate language model based on the detected language
         nlp = spacy.load(f'{language}_core_web_sm')
         #This will return a language object nlp containing all components and data needed to process text.
+
+
+
+        pattern = r'(http|https).+?(?=\s|$)'
+        # Utiliza re.sub() para buscar el patrón y reemplazarlo con una cadena vacía
+        text = re.sub(pattern, '', text)
+
 
         text = re.sub(r'\[[0-9]*\]', ' ', text)  
         text = re.sub(r'\s+', ' ', text)  
@@ -145,3 +150,4 @@ def consume_file(request):
 
 
        
+

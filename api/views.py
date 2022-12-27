@@ -35,9 +35,7 @@ def consume_file(request):
             text += curr_text.strip()
 
 
-        pattern = r'(http|https).+?(?=\s|$)'
-        # Utiliza re.sub() para buscar el patrón y reemplazarlo con una cadena vacía
-        text = re.sub(pattern, '', text)
+        
         
         # Delete reference sections
         text = re.sub(r'References.*', '', text, flags=re.DOTALL)
@@ -47,6 +45,10 @@ def consume_file(request):
  
             # Detect titles títulos
         titles = re.findall(r'^\s*#+ .*$', text, flags=re.MULTILINE)
+
+        pattern = r'(http|https).+?(?=\s|$)'
+        # Utiliza re.sub() para buscar el patrón y reemplazarlo con una cadena vacía
+        text = re.sub(pattern, '', text)
  
             # Delete titles of the text
         for title in titles:

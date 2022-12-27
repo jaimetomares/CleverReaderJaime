@@ -91,7 +91,6 @@ def consume_file(request):
                                         word_frequencies[word.text] += 1
                 
 
-
         max_frequency = max(word_frequencies.values())
 
         #divide each frequency value in word_frequencies with the max_frequency to normalize the frequencies.
@@ -144,4 +143,3 @@ def consume_file(request):
         return HttpResponse(summary)
 
 
-       

@@ -4,6 +4,8 @@ from django.conf import settings
 import PyPDF2
 import re
 
+import concurrent.futures
+
 import openai
 
 
@@ -48,17 +50,11 @@ def consume_file(request):
             # Delete tables
         text = re.sub(r'\n\s*\n\s*\|.*\|\s*\n', '\n', text, flags=re.DOTALL)
  
-            # Detect titles títulos
-        titles = re.findall(r'^\s*#+ .*$', text, flags=re.MULTILINE)
 
         pattern = r'(http|https).+?(?=\s|$)'
         # Utiliza re.sub() para buscar el patrón y reemplazarlo con una cadena vacía
         text = re.sub(pattern, '', text)
  
-            # Delete titles of the text
-        for title in titles:
-            text = text.replace(title, '')
-
         text = re.sub("’", "'", text)
         text = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", text)
         text = re.sub('()', '', text)
@@ -74,14 +70,17 @@ def consume_file(request):
         text = re.sub('Page', '', text)
 
         res = ""
-        summary = "Summarize the following text and group it by its content: \n" #Instrucción que darle a GPT
-        context_parts = [(summary + "Fragment: " + str(i) + "\n" + text[i:i+4000]) for i in range(0, len(text), 4000)] #Se divide el texto en chunks
+        summary = "Summarize the following text and group it by its content, ignoring the unsense phrases \n" #Instrucción que darle a GPT
+        context_parts = [(summary + "Fragment: " + str(i) + "\n" + text[i:i+4000]) for i in range(0, len(text), 3200)] #Se divide el texto en chunks
 
-        for i, context_part in enumerate(context_parts): #Por cada chunk se llama a la IA
-            completions = openai.Completion.create(engine=model_engine, prompt=context_part, max_tokens=400, n=1,stop=None,temperature=0.5, top_p=1,
-  frequency_penalty=0,
-  presence_penalty=0) 
-            res += completions.choices[0].text #Se añade el resumen del chunk actual al resultado
+        # Crea un Executor con un número de hilos igual al número de procesadores de tu máquina
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+    # Crea una lista de futuros con los hilos que se encargarán de realizar el resumen de cada fragmento
+            futures = [executor.submit(lambda context_part: openai.Completion.create(engine=model_engine, prompt=context_part, max_tokens=150, n=1,stop=None,temperature=0.75, top_p=1, frequency_penalty=0, presence_penalty=0).choices[0].text, context_part) for context_part in context_parts]
+
+    # Recorre la lista de futuros y recoge el resultado de cada uno
+            for future in concurrent.futures.as_completed(futures):
+                res += future.result()
 
 
         return HttpResponse(res)

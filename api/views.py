@@ -4,7 +4,6 @@ from django.conf import settings
 import PyPDF2
 import re
 
-from langdetect import detect
 
 
 from string import punctuation
@@ -53,8 +52,6 @@ def consume_file(request):
             text = text.replace(title, '')
 
 
-        # Detect PDF text language
-        language = detect(text)
 
 
 
@@ -67,8 +64,6 @@ def consume_file(request):
         processedText = re.sub("’", "'", text)
         processedText = re.sub("[^a-zA-Z' ]+", " ", processedText)
 
-        #Here we will create a list of stopwords.
-        stopwords = list(STOP_WORDS)
 
         
 

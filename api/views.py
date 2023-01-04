@@ -4,6 +4,8 @@ from django.conf import settings
 import PyPDF2
 import re
 
+import openai
+
 
 
 def consume_file(request):
@@ -17,6 +19,13 @@ def consume_file(request):
             return HttpResponse("El archivo debe ser un PDF.")
 
         doc = PyPDF2.PdfFileReader(file)
+
+        output = PyPDF2.PdfWriter()
+
+        pages = len(doc.pages)
+        
+        openai.api_key = "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"
+        model_engine = "text-davinci-003"
 
 
         pages = doc.getNumPages()

@@ -66,70 +66,7 @@ def consume_file(request):
         
 
 
-        #list of tokens
-        tokens = [token.text for token in doc]
 
-        
-
-
-        word_frequencies = {}
-        for word in doc:
-                if word.text.lower() not in stopwords:
-                        if word.text.lower() not in punctuation:
-                                if word.text not in word_frequencies.keys():
-                                        word_frequencies[word.text] = 1
-                                else:
-                                        word_frequencies[word.text] += 1
-                
-
-
-        max_frequency = max(word_frequencies.values())
-
-        #divide each frequency value in word_frequencies with the max_frequency to normalize the frequencies.
-        for word in word_frequencies.keys():
-                word_frequencies[word] = word_frequencies[word]/max_frequency
-
-
-        #sentence tokenization. The entire text is divided into sentences.
-        sentence_tokens = [sent for sent in doc.sents]
-
-        # The sentence score for a particular sentence is the sum of the normalized frequencies of the words in that sentence. All the sentences will be 
-        # stored with their score in the dictionary sentence_scores.
-        sentence_scores = {}
-        for sent in sentence_tokens:
-                for word in sent:
-                        if word.text.lower() in word_frequencies.keys():
-                                if sent not in sentence_scores.keys():
-                                        sentence_scores[sent] = word_frequencies[word.text.lower()]
-                                else:
-                                        sentence_scores[sent] += word_frequencies[word.text.lower()]
-                
-
-        #We want the length of summary to be 10% of the original length
-        select_length = int(len(sentence_tokens)*0.10)
-
-        summary = nlargest(select_length, sentence_scores, key = sentence_scores.get)
-
-        final_summary = [word.text for word in summary]
-        summary = ' '.join(final_summary)
-
-
-        patron = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' 
-        urls = re.findall(patron, text)
-
-        
-        summary = re.sub("’", "'", summary)
-        summary = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", summary)
-
-        summary = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", " ", summary)
-        summary = re.sub("http[s]?: (?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", " ", summary)
-
-        summary = re.sub('Fig', '', summary)
-        summary = re.sub('Figure', '', summary)
-        summary = re.sub('page', '', summary)
-        summary = re.sub('Page', '', summary)
-
-        summary = re.sub('()', '', summary)
 
 
         return HttpResponse(summary)

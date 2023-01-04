@@ -6,8 +6,7 @@ import re
 
 from langdetect import detect
 
-import spacy
-from spacy.lang.en.stop_words import STOP_WORDS
+
 from string import punctuation
 
 from heapq import nlargest
@@ -25,7 +24,6 @@ def consume_file(request):
 
         doc = PyPDF2.PdfFileReader(file)
 
-        nlp = spacy.load('en_core_web_sm')
 
         pages = doc.getNumPages()
         text = ""
@@ -57,9 +55,6 @@ def consume_file(request):
 
         # Detect PDF text language
         language = detect(text)
-        # Load the appropriate language model based on the detected language
-        nlp = spacy.load(f'{language}_core_web_sm')
-        #This will return a language object nlp containing all components and data needed to process text.
 
 
 
@@ -77,8 +72,6 @@ def consume_file(request):
 
         
 
-        #Calling the nlp object on a string of text will return a processed Doc. During processing, spaCy first tokenizes the text, i.e. segments it into words, punctuation and so on.
-        doc = nlp(text)
 
         #list of tokens
         tokens = [token.text for token in doc]

@@ -6,9 +6,6 @@ import re
 
 
 
-from heapq import nlargest
-
-
 def consume_file(request):
     if request.method == 'POST':
         file = request.FILES['file']

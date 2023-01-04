@@ -73,23 +73,18 @@ def consume_file(request):
         text = re.sub('page', '', text)
         text = re.sub('Page', '', text)
 
-        
+        res = ""
+        summary = "Summarize the following text and group it by its content: \n" #Instrucción que darle a GPT
+        context_parts = [(summary + "Fragment: " + str(i) + "\n" + text[i:i+4000]) for i in range(0, len(text), 4000)] #Se divide el texto en chunks
+
+        for i, context_part in enumerate(context_parts): #Por cada chunk se llama a la IA
+            completions = openai.Completion.create(engine=model_engine, prompt=context_part, max_tokens=400, n=1,stop=None,temperature=0.5, top_p=1,
+  frequency_penalty=0,
+  presence_penalty=0) 
+            res += completions.choices[0].text #Se añade el resumen del chunk actual al resultado
 
 
-
-        
-
-
-  
-
-
-        
-
-
-
-
-
-        return HttpResponse(summary)
+        return HttpResponse(res)
 
 
        

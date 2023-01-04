@@ -23,7 +23,7 @@ def consume_file(request):
         output = PyPDF2.PdfWriter()
 
         pages = len(doc.pages)
-        
+
         openai.api_key = "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"
         model_engine = "text-davinci-003"
 
@@ -31,9 +31,13 @@ def consume_file(request):
         pages = doc.getNumPages()
         text = ""
         for i in range(pages):
-            curr_page = doc.getPage(i)
-            curr_text = curr_page.extractText()
-            text += curr_text.strip()
+            curr_page = doc.pages[i]
+            output.add_page(curr_page)
+            output.remove_images()
+            output.remove_links()
+            curr_page = output.pages[i]
+            curr_text = curr_page.extract_text()
+            text += curr_text
 
 
         

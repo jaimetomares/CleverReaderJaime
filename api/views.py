@@ -59,18 +59,28 @@ def consume_file(request):
         for title in titles:
             text = text.replace(title, '')
 
+        text = re.sub("’", "'", text)
+        text = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", text)
+        text = re.sub('()', '', text)
+        text = re.sub(r'\[[0-9]*\]', ' ', text)  
+        text = re.sub(r'\s+', ' ', text)
+        text = re.sub("’", "'", text)
+        text = re.sub("[^a-zA-Z' ]+", " ", text)
 
+
+        text = re.sub('Fig', '', text)
+        text = re.sub('Figure', '', text)
+        text = re.sub('page', '', text)
+        text = re.sub('Page', '', text)
+
+        
 
 
 
         
 
 
-        text = re.sub(r'\[[0-9]*\]', ' ', text)  
-        text = re.sub(r'\s+', ' ', text)  
-
-        processedText = re.sub("’", "'", text)
-        processedText = re.sub("[^a-zA-Z' ]+", " ", processedText)
+  
 
 
         

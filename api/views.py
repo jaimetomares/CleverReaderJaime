@@ -6,8 +6,6 @@ import re
 
 
 
-from string import punctuation
-
 from heapq import nlargest
 
 
@@ -71,11 +69,7 @@ def consume_file(request):
         #list of tokens
         tokens = [token.text for token in doc]
 
-        #punctuation contains a string of all the punctuations
-        punctuation = ""
-        punctuation = punctuation + '\n'
-
-        #number of occurrences of all the distinct words in the text which are not punctuations or stop words
+        
 
 
         word_frequencies = {}

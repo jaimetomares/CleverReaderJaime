@@ -8,13 +8,12 @@ import openai
 
 def consume_file(request):
     if request.method == 'POST':
-        # Get the file from the POST request
+        
         file = request.FILES['file']
 
-        # Check if the file is a PDF
-        extension = file.name.split(".")[1]
-        if extension != "pdf":
-            return HttpResponse("The file must be a PDF.")
+        # Verifica si la extensión del archivo es '.pdf'
+        if not file.name.endswith('.pdf'):
+            return HttpResponseBadRequest("The file must be a PDF.")
 
         # Read the PDF file
         doc = PyPDF2.PdfFileReader(file)
@@ -26,7 +25,7 @@ def consume_file(request):
         pages = doc.getNumPages()
 
         # Set the API key and model for OpenAI
-        openai.api_key = "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"
+        openai.api_key = "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"
         model_engine = "text-davinci-003"
 
 

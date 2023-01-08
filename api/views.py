@@ -73,7 +73,7 @@ def consume_file(request):
         # Replace curly quotes with straight quotes
         text = re.sub("’", "'", text)
         # Replace any non-alphanumeric, non-quote, non-colon, non-semicolon, non-period, non-exclamation, non-question mark characters with a space
-# Replace any non-alphanumeric, non-quote characters with a space
+        # Replace any non-alphanumeric, non-quote characters with a space
         text = re.sub("[^a-zA-Z0-9\s\"\':;,.!?]+", " ", text)
         # Remove empty parentheses
         text = re.sub('()', '', text)

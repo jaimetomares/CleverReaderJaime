@@ -5,6 +5,8 @@ import PyPDF2
 import re
 import concurrent.futures
 import openai
+from unidecode import unidecode
+
 
 def consume_file(request):
     if request.method == 'POST':
@@ -51,6 +53,8 @@ def consume_file(request):
             # Extract the text from the current page
             curr_text = curr_page.extract_text()
             # Append the extracted text to the text string
+            text = unidecode(text)
+
             text += curr_text
         
         # Delete the reference sections from the text
@@ -69,7 +73,8 @@ def consume_file(request):
         # Replace curly quotes with straight quotes
         text = re.sub("’", "'", text)
         # Replace any non-alphanumeric, non-quote, non-colon, non-semicolon, non-period, non-exclamation, non-question mark characters with a space
-        text = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", text)
+# Replace any non-alphanumeric, non-quote characters with a space
+        text = re.sub("[^a-zA-Z0-9\s\"\':;,.!?]+", " ", text)
         # Remove empty parentheses
         text = re.sub('()', '', text)
         # Remove bracketed numbers

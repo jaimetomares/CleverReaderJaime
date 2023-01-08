@@ -100,7 +100,7 @@ def consume_file(request):
         # Set the summary instruction for the GPT model
         summary = "Summarize the following text and group it by its content, ignoring the unsense phrases \n"
 
-        # Divide the text into chunks of 3800 characters
+        # Divide the text into chunks of x characters
         context_parts = [(summary + "Fragment: " + str(i) + "\n" + text[i:i+4500]) for i in range(0, len(text), 4500)]
 
         # Create a ThreadPoolExecutor with the same number of threads as the number of processors in your machine

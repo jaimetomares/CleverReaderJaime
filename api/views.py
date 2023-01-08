@@ -3,143 +3,118 @@ from django.http import HttpResponseBadRequest
 from django.conf import settings
 import PyPDF2
 import re
-
-from langdetect import detect
-
-import spacy
-from spacy.lang.en.stop_words import STOP_WORDS
-from string import punctuation
-
-from heapq import nlargest
+import concurrent.futures
+import openai
 
 def consume_file(request):
-    if request.method == 'POST': 
-
+    if request.method == 'POST':
+        # Get the file from the POST request
         file = request.FILES['file']
 
-        extension = file.name.split(".")
-        extension[1] != "pdf"
-        extension = ["sample", "pdf"]
-        if(extension[1] != "pdf"):
-            return HttpResponseBadRequest
+        # Check if the file is a PDF
+        extension = file.name.split(".")[1]
+        if extension != "pdf":
+            return HttpResponse("The file must be a PDF.")
 
+        # Read the PDF file
         doc = PyPDF2.PdfFileReader(file)
+
+        # Initialize a PDF writer
+        output = PyPDF2.PdfWriter()
+
+        # Get the number of pages in the PDF
         pages = doc.getNumPages()
+
+        # Set the API key and model for OpenAI
+        openai.api_key = "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"
+        model_engine = "text-davinci-003"
+
+
+        # Get the number of pages in the PDF
+        pages = doc.getNumPages()
+
+        # Initialize an empty string to store the text
         text = ""
-        
-        # Extract text from PDF file
-        # Get each page and extract text
+
+
+        # Iterate through each page in the PDF
         for i in range(pages):
-            curr_page = doc.getPage(i)
-            curr_text = curr_page.extractText()
-            text += curr_text.strip()
-
-
-
-        # Delete reference sections
+            # Get the current page
+            curr_page = doc.pages[i]
+            # Add the current page to the output PDF
+            output.add_page(curr_page)
+            # Remove images from the current page
+            output.remove_images()
+            # Remove links from the current page
+            output.remove_links()
+            # Get the current page from the output PDF
+            curr_page = output.pages[i]
+            # Extract the text from the current page
+            curr_text = curr_page.extract_text()
+            # Append the extracted text to the text string
+            text += curr_text
+        
+        # Delete the reference sections from the text
         text = re.sub(r'References.*', '', text, flags=re.DOTALL)
  
-            # Delete tables
+        # Delete tables from the text
         text = re.sub(r'\n\s*\n\s*\|.*\|\s*\n', '\n', text, flags=re.DOTALL)
  
-            # Detect titles títulos
-        titles = re.findall(r'^\s*#+ .*$', text, flags=re.MULTILINE)
+
+        # Define a pattern for URLs
+        pattern = r'(http|https).+?(?=\s|$)'
+        # Use re.sub() to search for the pattern and replace it with an empty string
+        text = re.sub(pattern, '', text)
+
  
-            # Delete titles of the text
-        for title in titles:
-            text = text.replace(title, '')
-
-
-        # Detect PDF text language
-        language = detect(text)
-        
-        # Load the appropriate language model based on the detected language
-        nlp = spacy.load(f'{language}_core_web_sm')
-        #This will return a language object nlp containing all components and data needed to process text.
-
+        # Replace curly quotes with straight quotes
+        text = re.sub("’", "'", text)
+        # Replace any non-alphanumeric, non-quote, non-colon, non-semicolon, non-period, non-exclamation, non-question mark characters with a space
+        text = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", text)
+        # Remove empty parentheses
+        text = re.sub('()', '', text)
+        # Remove bracketed numbers
         text = re.sub(r'\[[0-9]*\]', ' ', text)  
-        text = re.sub(r'\s+', ' ', text)  
-
-        processedText = re.sub("’", "'", text)
-        processedText = re.sub("[^a-zA-Z' ]+", " ", processedText)
-
-        #Here we will create a list of stopwords.
-        stopwords = list(STOP_WORDS)
-
-        
-
-        #Calling the nlp object on a string of text will return a processed Doc. During processing, spaCy first tokenizes the text, i.e. segments it into words, punctuation and so on.
-        doc = nlp(text)
-
-        #list of tokens
-        tokens = [token.text for token in doc]
-
-        #punctuation contains a string of all the punctuations
-        punctuation = ""
-        punctuation = punctuation + '\n'
-
-        #number of occurrences of all the distinct words in the text which are not punctuations or stop words
+        # Replace multiple spaces with a single space
+        text = re.sub(r'\s+', ' ', text)
+        # Replace curly quotes with straight quotes
+        text = re.sub("’", "'", text)
+        # Replace any non-alphanumeric, non-quote characters with a space
+        text = re.sub("[^a-zA-Z' ]+", " ", text)
 
 
-        word_frequencies = {}
-        for word in doc:
-                if word.text.lower() not in stopwords:
-                        if word.text.lower() not in punctuation:
-                                if word.text not in word_frequencies.keys():
-                                        word_frequencies[word.text] = 1
-                                else:
-                                        word_frequencies[word.text] += 1
-                
-
-        max_frequency = max(word_frequencies.values())
-
-        #divide each frequency value in word_frequencies with the max_frequency to normalize the frequencies.
-        for word in word_frequencies.keys():
-                word_frequencies[word] = word_frequencies[word]/max_frequency
+        # Remove the word 'Fig' from the text
+        text = re.sub('Fig', '', text)
+        # Remove the word 'Figure' from the text
+        text = re.sub('Figure', '', text)
+        # Remove the word 'page' from the text
+        text = re.sub('page', '', text)
+        # Remove the word 'Page' from the text
+        text = re.sub('Page', '', text)
 
 
-        #sentence tokenization. The entire text is divided into sentences.
-        sentence_tokens = [sent for sent in doc.sents]
 
-        # The sentence score for a particular sentence is the sum of the normalized frequencies of the words in that sentence. All the sentences will be 
-        # stored with their score in the dictionary sentence_scores.
-        sentence_scores = {}
-        for sent in sentence_tokens:
-                for word in sent:
-                        if word.text.lower() in word_frequencies.keys():
-                                if sent not in sentence_scores.keys():
-                                        sentence_scores[sent] = word_frequencies[word.text.lower()]
-                                else:
-                                        sentence_scores[sent] += word_frequencies[word.text.lower()]
-                
+        # Initialize an empty string to store the summary
+        res = ""
 
-        #We want the length of summary to be 10% of the original length
-        select_length = int(len(sentence_tokens)*0.10)
+        # Set the summary instruction for the GPT model
+        summary = "Summarize the following text and group it by its content, ignoring the unsense phrases \n"
 
-        summary = nlargest(select_length, sentence_scores, key = sentence_scores.get)
+        # Divide the text into chunks of 3800 characters
+        context_parts = [(summary + "Fragment: " + str(i) + "\n" + text[i:i+4500]) for i in range(0, len(text), 4500)]
 
-        final_summary = [word.text for word in summary]
-        summary = ' '.join(final_summary)
+        # Create a ThreadPoolExecutor with the same number of threads as the number of processors in your machine
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+        # Create a list of futures with the threads that will perform the summary of each fragment
+            futures = [executor.submit(lambda context_part: openai.Completion.create(engine=model_engine, prompt=context_part, max_tokens=160, n=1,stop=None,temperature=0.75, top_p=1, frequency_penalty=0, presence_penalty=0).choices[0].text, context_part) for context_part in context_parts]
 
+            # Iterate through the list of futures and collect the result of each one
+            for future in concurrent.futures.as_completed(futures):
+                res += future.result()
 
-        patron = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' 
-        urls = re.findall(patron, text)
-
-        
-        summary = re.sub("’", "'", summary)
-        summary = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", summary)
-
-        summary = re.sub("http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", " ", summary)
-        summary = re.sub("http[s]?: (?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", " ", summary)
-
-        summary = re.sub('Fig', '', summary)
-        summary = re.sub('Figure', '', summary)
-        summary = re.sub('page', '', summary)
-        summary = re.sub('Page', '', summary)
-
-        summary = re.sub('()', '', summary)
+        # Return the summary as an HTTP response
+        return HttpResponse(res)
 
 
-        return HttpResponse(summary)
-
+       
 

@@ -35,11 +35,11 @@ class ConsumeFileTestCase(TestCase):
 
     def test_text_extraction(self):
         # Read the PDF file
-        with open('C:\\Users\\Jaime\\Downloads\\article.pdf', 'rb') as file:
+        with open('C:\\Users\\Jaime\\Downloads\\article_with_multi_picture_figures.pdf', 'rb') as file:
             expected_text = file.read().decode('utf-8')
 
         # Send a POST request with the PDF file
-        with open('C:\\Users\\Jaime\\Downloads\\article.pdf', 'rb') as file:
+        with open('C:\\Users\\Jaime\\Downloads\\article_with_multi_picture_figures.pdf', 'rb') as file:
             response = self.client.post(reverse('consume_file'), {'file': file})
         # Get the extracted text from the response
         extracted_text = response.content.decode('utf-8')
@@ -56,7 +56,7 @@ class ConsumeFileTestCase(TestCase):
 
         file = SimpleUploadedFile("C:\\Users\\Jaime\\Downloads\\article_with_multi_picture_figures.pdf", file_content)
 
-        # Aquí podríamos comprobar el contenido del archivo y asegurarnos de que no contiene imágenes
+        # Here we can check the content of the file and make sure that it does not contain images
         self.assertEqual(response.status_code, 200)
         response_text = response.content.decode('utf-8')
         self.assertNotIn('\x00', response_text)
@@ -65,14 +65,14 @@ class ConsumeFileTestCase(TestCase):
         
     
     def test_link_removal(self):
-    # Realizar una petición POST con un archivo que contenga enlaces
+    # Make a POST request with a file containing links
         with open('C:\\Users\\Jaime\\Downloads\\article_with_multi_picture_figures.pdf', 'rb') as file:
             response = self.client.post('/consume_file/', {'file': file})
-    # Obtener el texto extraído del archivo
+    # Get the text extracted from the file
         extracted_text = response.content.decode('utf-8')
-    # Buscar enlaces en el texto extraído
+    # Search for links in the extracted text
         links = re.findall(r'(http|https).+?(?=\s|$)', extracted_text)
-    # Verificar que no se encontraron enlaces
+    # Check that no links were found
         self.assertEqual(len(links), 0)
         
 

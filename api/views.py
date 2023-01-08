@@ -5,16 +5,17 @@ import PyPDF2
 import re
 import concurrent.futures
 import openai
+from unidecode import unidecode
+
 
 def consume_file(request):
     if request.method == 'POST':
-        # Get the file from the POST request
+        
         file = request.FILES['file']
 
-        # Check if the file is a PDF
-        extension = file.name.split(".")[1]
-        if extension != "pdf":
-            return HttpResponse("The file must be a PDF.")
+        # Verifica si la extensión del archivo es '.pdf'
+        if not file.name.endswith('.pdf'):
+            return HttpResponseBadRequest("The file must be a PDF.")
 
         # Read the PDF file
         doc = PyPDF2.PdfFileReader(file)
@@ -26,7 +27,7 @@ def consume_file(request):
         pages = doc.getNumPages()
 
         # Set the API key and model for OpenAI
-        openai.api_key = "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"
+        openai.api_key = "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"
         model_engine = "text-davinci-003"
 
 
@@ -52,6 +53,8 @@ def consume_file(request):
             # Extract the text from the current page
             curr_text = curr_page.extract_text()
             # Append the extracted text to the text string
+            text = unidecode(text)
+
             text += curr_text
         
         # Delete the reference sections from the text
@@ -70,7 +73,8 @@ def consume_file(request):
         # Replace curly quotes with straight quotes
         text = re.sub("’", "'", text)
         # Replace any non-alphanumeric, non-quote, non-colon, non-semicolon, non-period, non-exclamation, non-question mark characters with a space
-        text = re.sub("[^a-zA-Z0-9'\"():;,.!?— ]+", " ", text)
+# Replace any non-alphanumeric, non-quote characters with a space
+        text = re.sub("[^a-zA-Z0-9\s\"\':;,.!?]+", " ", text)
         # Remove empty parentheses
         text = re.sub('()', '', text)
         # Remove bracketed numbers
@@ -100,7 +104,7 @@ def consume_file(request):
         # Set the summary instruction for the GPT model
         summary = "Summarize the following text and group it by its content, ignoring the unsense phrases \n"
 
-        # Divide the text into chunks of 3800 characters
+        # Divide the text into chunks of x characters
         context_parts = [(summary + "Fragment: " + str(i) + "\n" + text[i:i+4500]) for i in range(0, len(text), 4500)]
 
         # Create a ThreadPoolExecutor with the same number of threads as the number of processors in your machine

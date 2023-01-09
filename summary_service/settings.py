@@ -11,9 +11,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -24,6 +24,8 @@ SECRET_KEY = 'django-insecure-#b#9ax4*^8x(=cdtfr1jie1ybnzav0#uxy#)s92+k!yq!n52a4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+
 ALLOWED_HOSTS = ['*']
 
 API_KEY = ''
@@ -31,10 +33,23 @@ API_KEY = ''
 # Application definition
 
 INSTALLED_APPS = [
-    'api.apps.summary_serviceAppConfig'
+    'api.apps.summary_serviceAppConfig',
+    'corsheaders'
 ]
 
 ROOT_URLCONF = 'summary_service.urls'
+
+MIDDLEWARE_CLASSES = [
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
 TEMPLATES = [
     {
@@ -47,7 +62,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'summary_service.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -57,7 +71,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -69,7 +82,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/

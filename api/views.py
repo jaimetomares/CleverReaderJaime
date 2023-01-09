@@ -11,7 +11,6 @@ from unidecode import unidecode
 
 def consume_file(request):
     if request.method == 'POST':
-
         file = request.FILES['file']
 
         # Verifica si la extensión del archivo es '.pdf'
@@ -28,7 +27,7 @@ def consume_file(request):
         pages = doc.getNumPages()
 
         # Set the API key and model for OpenAI
-        openai.api_key = "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"
+        openai.api_key = "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"
         model_engine = "text-davinci-003"
 
         # Get the number of pages in the PDF

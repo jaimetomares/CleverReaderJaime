@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
@@ -27,7 +28,7 @@ def consume_file(request):
         pages = doc.getNumPages()
 
         # Set the API key and model for OpenAI
-        openai.api_key = "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"
+        openai.api_key = os.environ.get("API_KEY")
         model_engine = "text-davinci-003"
 
         # Get the number of pages in the PDF

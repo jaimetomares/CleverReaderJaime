@@ -45,8 +45,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://clever-reader-client.web.app/",
-    "http://localhost:3000"
+    "https://clever-reader-client.web.app",
+    "http://localhost:3000",
 ]
 
 CORS_ALLOW_HEADERS = [

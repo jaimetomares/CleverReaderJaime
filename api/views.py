@@ -1,6 +1,5 @@
 import json
 
-import requests
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 import PyPDF2
@@ -11,9 +10,9 @@ from unidecode import unidecode
 
 
 def consume_file(request):
-    if request.method == 'GET':
-        resource_id = request.GET['id']
-        file = requests.get(f"https://clever-reader-middleware.onrender.com/api/v1/file/{resource_id}")
+    if request.method == 'POST':
+
+        file = request.FILES['file']
 
         # Verifica si la extensión del archivo es '.pdf'
         if not file.name.endswith('.pdf'):

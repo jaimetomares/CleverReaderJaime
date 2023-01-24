@@ -96,7 +96,7 @@ def consume_file(request):
         res = ""
 
         # Set the summary instruction for the GPT model
-        summary = "Summarize the following text and group it by its content, ignoring the unsense phrases \n"
+        summary = "Summarize the following text and group it by its content \n"
 
         # Divide the text into chunks of x characters
         context_parts = [(summary + "Fragment: " + str(i) + "\n" + text[i:i + 4500]) for i in range(0, len(text), 4500)]
@@ -116,3 +116,4 @@ def consume_file(request):
                 res += future.result()
         response_data = {'data': res}
         return HttpResponse(json.dumps(response_data), content_type="application/json")
+

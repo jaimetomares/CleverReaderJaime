@@ -13,3 +13,5 @@ The text extracted from each page is concatenated into a text string.
 The text string is cleaned of reference sections, tables, URLs and special characters.
 Some specific keywords are removed from the text.
 The processed text is sent to an OpenAI model for processing and the result is returned to the user.
+It is sent to a Middleware service where It will also be sent to a front end part of a project which will use the contento result of this summary application.
+You can see in tests.py all the unit tests where you can check the functionality of the consume_file function code.

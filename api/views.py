@@ -117,7 +117,3 @@ def consume_file(request):
         response_data = {'data': res}
         return HttpResponse(json.dumps(response_data), content_type="application/json")
 
-       
-
-
-

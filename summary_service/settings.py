@@ -26,7 +26,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 ALLOWED_HOSTS = ['*']
 
 API_KEY = ''
+<<<<<<< HEAD
 TLDR_KEY = ""
+=======
+>>>>>>> ca7d592c225d2995e0d1f7f75b9d4339ba99f824
 
 # Application definition
 

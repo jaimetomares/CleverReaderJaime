@@ -54,5 +54,4 @@ def consume_file(request):
         else:
             print("Summary not found.")
 
-        return HttpResponse(json.dumps(summary))
-
+        return HttpResponse(json.dumps(summary), content_type="application/json")

@@ -55,3 +55,4 @@ def consume_file(request):
             print("Summary not found.")
 
         return HttpResponse(json.dumps(summary))
+

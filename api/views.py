@@ -48,10 +48,12 @@ def consume_file(request):
         title = get_paper_title(file)
         paper_id = search_paper_on_ss(title)
         summary = get_paper_summary(paper_id)
+        
+        response_data = {'data': summary}
 
         if summary is not None:
             print(f"TLDR Summary: {summary}")
-            return HttpResponse(json.dumps(summary), content_type="application/json")
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             print("Summary not found.")
             return HttpResponse('Not found', content_type='application/json')

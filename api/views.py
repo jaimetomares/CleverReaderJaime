@@ -53,7 +53,7 @@ def consume_file(request):
 
         if summary is not None:
             print(f"TLDR Summary: {summary}")
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             print("Summary not found.")
             return HttpResponse('Not found', content_type='application/json')

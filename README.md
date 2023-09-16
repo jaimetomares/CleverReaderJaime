@@ -1,6 +1,6 @@
 # CleverReaderJaime
 
-        Repository for summary service
+        Repository for PDF summary service from a POST request
 
 This program runs in a Django environment and is located in a folder called 'api/views.py'. A PDF file submitted via a POST request is processed and returns the result of an OpenAI model processing the text of the file.
 
